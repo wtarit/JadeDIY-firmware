@@ -8,11 +8,10 @@
 #include "../process.h"
 #include "../sensitive.h"
 #include "../storage.h"
-#include "../ui.h"
+#include "../ui/sign_tx.h"
 #include "../utils/cbor_rpc.h"
 #include "../utils/event.h"
 #include "../utils/malloc_ext.h"
-#include "../utils/network.h"
 #include "../utils/psbt.h"
 #include "../utils/temporary_stack.h"
 #include "../utils/util.h"
@@ -28,19 +27,12 @@
 
 #include "process_utils.h"
 
-bool show_btc_transaction_outputs_activity(
-    network_t network_id, const struct wally_tx* tx, const output_info_t* output_info);
 bool show_btc_fee_confirmation_activity(const struct wally_tx* tx, const output_info_t* outinfo,
     script_flavour_t aggregate_inputs_scripts_flavour, uint64_t input_amount, uint64_t output_amount);
 
-bool show_elements_transaction_outputs_activity(network_t network_id, const struct wally_tx* tx,
-    const output_info_t* output_info, const asset_info_t* assets, size_t num_assets);
-bool show_elements_swap_activity(network_t network_id, bool initial_proposal, const asset_summary_t* in_sums,
-    size_t num_in_sums, const asset_summary_t* out_sums, size_t num_out_sums, const asset_info_t* assets,
-    size_t num_assets);
 bool show_elements_fee_confirmation_activity(network_t network_id, const struct wally_tx* tx,
     const output_info_t* outinfo, script_flavour_t aggregate_inputs_scripts_flavour, uint64_t fees, TxType_t txtype,
-    bool tx_is_partial);
+    bool is_partial);
 
 // From https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki
 static const uint8_t PSBT_MAGIC_PREFIX[5] = { 0x70, 0x73, 0x62, 0x74, 0xFF }; // 'psbt' + 0xff
