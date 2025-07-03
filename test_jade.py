@@ -19,7 +19,6 @@ import wallycore as wally
 from jadepy.jade import JadeAPI, JadeError
 
 # Enable jade logging
-args = None
 jadehandler = logging.StreamHandler()
 
 logger = logging.getLogger('jadepy.jade')
@@ -32,7 +31,8 @@ device_logger.addHandler(jadehandler)
 
 
 def wait(seconds):
-    time.sleep(seconds)
+    if not args.run_sw:
+        time.sleep(seconds)
 
 
 def h2b(hexdata):
@@ -3464,6 +3464,9 @@ ZoxpDgc3UZwmpCgfdCkNmcSQa2tjnZLPohvRFECZP9P1boFKdJ5Sx'
 
 
 def test_sign_identity(jadeapi):
+    if args.run_sw:
+        return  # FIXME: Software Jade doesn't support bip85 entropy yet
+
     ecdh_nist_cpty = list(_get_test_cases('identity_ssh_nist_matches_trezor.json'))[0]
     for identity_data in _get_test_cases(SIGN_IDENTITY_TESTS):
         inputdata = identity_data['input']
@@ -3503,6 +3506,8 @@ def test_sign_identity(jadeapi):
 
 # Test according to otp spec (rfc6238)
 def test_hotp(jadeapi):
+    if args.run_sw:
+        return  # FIXME
     hotp_name = 'test_hotp'
     hotp_uri = 'otpauth://hotp/ACME%20Co:john.doe@email.com\
 ?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=ACME%20Co&counter={}'
@@ -3537,6 +3542,8 @@ def test_hotp(jadeapi):
 
 # Test according to otp spec (rfc6238)
 def test_totp(jadeapi):
+    if args.run_sw:
+        return  # FIXME
     totp_name = 'test_totp'
     totp_uri = 'otpauth://totp/ACME%20Co:john.doe@email.com\
 ?secret=GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ&issuer=ACME%20Co&digits=8&algorithm={}'
@@ -3580,6 +3587,8 @@ def test_totp(jadeapi):
 # This provides compatability with gauth-like services, and should also remain compatible with
 # HOTP/SHA1 which does not extend the secrets.
 def test_totp_ex(jadeapi):
+    if args.run_sw:
+        return  # FIXME
     # Short secret - not padded/lengthened for SHA1 for maximum gauth compatibility
     totp_name = 'test_totp_ex'
     totp_uri = 'otpauth://totp/ACM?secret=VMR466AB62ZBOKHE&digits=6&algorithm=SHA1'
@@ -3711,10 +3720,12 @@ def run_api_tests(jadeapi, isble, qemu, authuser=False):
     test_set_pinserver(jadeapi)
 
     # Test BIP85 entropy
-    test_bip85_bip39_encrypted_entropy(jadeapi)
-    test_bip85_rsa_encrypted_entropy(jadeapi)
-    test_bip85_rsa_pubkey(jadeapi)
-    test_bip85_rsa_signing(jadeapi)
+    if not args.run_sw:
+        # FIXME: Software Jade doesn't support bip85 entropy yet
+        test_bip85_bip39_encrypted_entropy(jadeapi)
+        test_bip85_rsa_encrypted_entropy(jadeapi)
+        test_bip85_rsa_pubkey(jadeapi)
+        test_bip85_rsa_signing(jadeapi)
 
     # Test generic multisig
     test_generic_multisig_registration(jadeapi)
@@ -3881,12 +3892,12 @@ def run_interface_tests(jadeapi,
 
     # Too much input test - sends a lot of data so only run
     # if not running over BLE (as would take a long time)
-    if not isble:
+    if not isble and not args.run_sw:
         logger.info(f'Buffer overflow test - PSRAM: {has_psram}')
         test_too_much_input(jadeapi.jade, has_psram)
 
     # Negative tests
-    if negative:
+    if negative and not args.run_sw:  # FIXME: enable for Software Jade
         logger.info('Negative tests')
         test_random_bytes(jadeapi.jade)
         test_very_bad_message(jadeapi.jade)
@@ -3896,6 +3907,7 @@ def run_interface_tests(jadeapi,
         test_unknown_method(jadeapi.jade)
         test_unexpected_method(jadeapi.jade)
         test_bad_params(jadeapi.jade)
+    if negative:
         test_bad_params_liquid(jadeapi.jade, has_psram, has_ble)
 
     rslt = jadeapi.logout()
@@ -4005,6 +4017,11 @@ def mixed_sources_test(serialport, bleid):
 def run_all_jade_tests(info):
     logger.info('Running Jade tests over selected backend interfaces')
 
+    if args.run_sw:
+        logger.info("Testing Software")
+        with JadeAPI.create_software(timeout=args.swtimeout) as jade:
+            run_jade_tests(jade, isble=False)
+
     # 1. Test over serial connection
     if not args.skipserial:
         logger.info(f'Testing Serial ({args.serialport})')
@@ -4037,6 +4054,11 @@ def run_all_jade_tests(info):
 
 # Connect to Jade by serial or BLE and get the info block
 def get_jade_info():
+    if args.run_sw:
+        logger.info("Getting info via Software")
+        with JadeAPI.create_software() as jade:
+            return jade.get_version_info()
+
     if not args.skipserial:
         logger.info(f'Getting info via Serial ({args.serialport})')
         with JadeAPI.create_serial(device=args.serialport,
@@ -4171,6 +4193,17 @@ if __name__ == '__main__':
                         type=int,
                         help='Serial port timeout',
                         default=DEFAULT_SERIAL_TIMEOUT)
+    parser.add_argument("--run_sw",
+                        action="store_true",
+                        dest="run_sw",
+                        help="Run tests over software jade",
+                        default=False)
+    parser.add_argument("--swtimeout",
+                        action="store",
+                        dest="swtimeout",
+                        type=int,
+                        help="Software Jade timeout",
+                        default=None)
     parser.add_argument('--authuser',
                         action='store_true',
                         dest='authuser',
@@ -4196,10 +4229,13 @@ if __name__ == '__main__':
     args = parser.parse_args()
     jadehandler.setLevel(getattr(logging, args.loglevel))
     logger.debug(f'args: {args}')
-    manage_agents = args.agentkeyfile and not args.skipble and not args.noagent
+    manage_agents = args.agentkeyfile and not args.skipble and not args.noagent and not args.run_sw
 
-    if args.skipserial and args.skipble:
-        logger.error('Can only skip one of Serial or BLE tests, not both!')
+    if args.run_sw:
+        args.skipserial = True
+        args.skipble = True
+    elif args.skipserial and args.skipble:
+        logger.error("Can only skip one of Serial or BLE tests, not both!")
         os.exit(1)
 
     if args.bleid and not args.skipserial:
@@ -4207,8 +4243,9 @@ if __name__ == '__main__':
         os.exit(1)
 
     # Run the thread that forces exit if we're too long running
-    t = threading.Thread(target=check_stuck, daemon=True)
-    t.start()
+    if not args.run_sw:
+        t = threading.Thread(target=check_stuck, daemon=True)
+        t.start()
 
     # If ble, start the agent to supply the required passkey for authentication
     # and encryption - don't bother if not.
