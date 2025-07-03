@@ -151,7 +151,6 @@ static void unsupported_process(void* process, char* name)
 }
 #define UNSUPPORTED(n) void n##_process(void* p) { unsupported_process(p, #n); }
 
-UNSUPPORTED(debug_scan_qr)
 UNSUPPORTED(get_bip85_bip39_entropy)
 UNSUPPORTED(get_bip85_rsa_entropy)
 int get_bip85_bip39_entropy_cbor(const CborValue* params, CborEncoder* output, const char** errmsg)

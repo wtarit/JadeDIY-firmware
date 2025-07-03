@@ -71,6 +71,6 @@ ${SW_JADE_CC} -c ${SW_JADE_CFLAGS} \
 # libjade.so
 ${SW_JADE_CXX} -shared -pthread -Wl,--no-undefined \
     -fPIC -DPIC -fvisibility=hidden \
-    libjade/libjade.o libjade/bc_ur.o ${SW_JADE_LDFLAGS} -lm -o libjade.so
+    libjade/libjade.o libjade/bc_ur.o ${SW_JADE_LDFLAGS} -lm -lz -o libjade.so
 
 rm -f libjade/libjade.o libjade/bc_ur.o

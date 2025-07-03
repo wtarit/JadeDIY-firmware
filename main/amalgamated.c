@@ -86,9 +86,7 @@ void __wrap_abort(void);
 #include "./process/dashboard.c"
 #include "./process/debug_clean.c"
 #include "./process/debug_handshake.c"
-#ifndef CONFIG_LIBJADE
 #include "./process/debug_scan_qr.c"
-#endif // CONFIG_LIBJADE
 #include "./process/debug_set_mnemonic.c"
 #ifndef CONFIG_LIBJADE
 #include "./process/get_bip85_entropy.c"
