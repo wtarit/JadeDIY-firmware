@@ -29,6 +29,12 @@ except (ImportError, FileNotFoundError) as e:
     logger.warning(e)
     logger.warning('BLE scanning/connectivity will not be available')
 
+try:
+    from .jade_sw import JadeSWImpl
+except (ImportError, FileNotFoundError) as e:
+    logger.debug(e)
+    logger.debug('Software Jade emulation will not be available')
+
 
 # Default serial connection
 DEFAULT_BAUD_RATE = 115200
@@ -38,6 +44,9 @@ DEFAULT_SERIAL_TIMEOUT = 120
 DEFAULT_BLE_DEVICE_NAME = 'Jade'
 DEFAULT_BLE_SERIAL_NUMBER = None
 DEFAULT_BLE_SCAN_TIMEOUT = 60
+
+# Default Software connection
+DEFAULT_SOFTWARE_TIMEOUT = 5
 
 
 def _hexlify(data):
@@ -253,6 +262,30 @@ class JadeAPI:
         """
         impl = JadeInterface.create_ble(device_name, serial_number,
                                         scan_timeout, loop)
+        return JadeAPI(impl)
+
+    @staticmethod
+    def create_software(timeout=None):
+        """
+        Create a JadeAPI object using an in-process software implementation.
+        NOTE: raises JadeError if software Jade dependencies not installed.
+
+        Parameters
+        ----------
+        timeout : int, optional
+            The read timeout when awaiting messages (Uses 5s if not given).
+
+        Returns
+        -------
+        JadeAPI
+            API object configured to use the in-process Jade library.
+            NOTE: The caller must call 'connect()' before using the instance.
+
+        Raises
+        ------
+        JadeError if software emulation is not available (libjade.so not installed)
+        """
+        impl = JadeInterface.create_software(timeout)
         return JadeAPI(impl)
 
     def connect(self):
@@ -2103,6 +2136,29 @@ class JadeInterface:
                            serial_number or DEFAULT_BLE_SERIAL_NUMBER,
                            scan_timeout or DEFAULT_BLE_SCAN_TIMEOUT,
                            loop=loop)
+        return JadeInterface(impl)
+
+    @staticmethod
+    def create_software(timeout=None):
+        """
+        Create a JadeInterface object using an in-process software implementation.
+
+        Parameters
+        ----------
+        timeout : int, optional
+            The read timeout when awaiting messages (Uses 5s if not given).
+
+        Returns
+        -------
+        JadeInterface
+            Interface object configured to use the in-process Jade library.
+            NOTE: The caller must call 'connect()' before using the instance.
+        """
+        this_module = sys.modules[__name__]
+        if not hasattr(this_module, "JadeSWImpl"):
+            raise JadeError(1, "Software Jade support not installed", None)
+
+        impl = JadeSWImpl(timeout or DEFAULT_SOFTWARE_TIMEOUT)
         return JadeInterface(impl)
 
     def connect(self):
