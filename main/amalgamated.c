@@ -33,8 +33,10 @@ void __wrap_abort(void);
 #endif // CONFIG_BT_ENABLED
 #include "./camera.c"
 #include "./descriptor.c"
+#ifndef CONFIG_LIBJADE
 #include "./display.c"
 #include "./display_hw.c"
+#endif // CONFIG_LIBJADE
 #include "./fonts/BigFont.c"
 #include "./fonts/DefaultFont.c"
 #include "./fonts/DejaVuSans18.c"
@@ -56,9 +58,13 @@ void __wrap_abort(void);
 #include "./fonts/minya24.c"
 #include "./fonts/tooney32.c"
 #include "./fonts/various_symbols.c"
+#ifndef CONFIG_LIBJADE_NO_GUI
 #include "./gui.c"
+#endif // CONFIG_LIBJADE_NO_GUI
+#ifndef CONFIG_LIBJADE
 #include "./identity.c"
 #include "./idletimer.c"
+#endif // CONFIG_LIBJADE
 #ifdef ESP_PLATFORM
 #include "./input.c"
 #endif // ESP_PLATFORM
@@ -69,22 +75,30 @@ void __wrap_abort(void);
 #endif // ESP_PLATFORM
 #include "./main.c"
 #include "./multisig.c"
+#ifndef CONFIG_LIBJADE
 #include "./otpauth.c"
+#endif // CONFIG_LIBJADE
 #include "./power.c"
 #include "./process.c"
 #include "./process/auth_user.c"
 #include "./process/dashboard.c"
 #include "./process/debug_clean.c"
 #include "./process/debug_handshake.c"
+#ifndef CONFIG_LIBJADE
 #include "./process/debug_scan_qr.c"
+#endif // CONFIG_LIBJADE
 #include "./process/debug_set_mnemonic.c"
+#ifndef CONFIG_LIBJADE
 #include "./process/get_bip85_entropy.c"
 #include "./process/get_bip85_pubkey.c"
+#endif // CONFIG_LIBJADE
 #include "./process/get_blinding_factor.c"
 #include "./process/get_blinding_key.c"
 #include "./process/get_commitments.c"
+#ifndef CONFIG_LIBJADE
 #include "./process/get_identity_pubkey.c"
 #include "./process/get_identity_shared_key.c"
+#endif // CONFIG_LIBJADE
 #include "./process/get_master_blinding_key.c"
 #include "./process/get_otp_code.c"
 #include "./process/get_receive_address.c"
@@ -95,9 +109,11 @@ void __wrap_abort(void);
 #include "./process/get_shared_nonce.c"
 #include "./process/get_xpubs.c"
 #include "./process/mnemonic.c"
+#ifndef CONFIG_LIBJADE
 #include "./process/ota.c"
 #include "./process/ota_delta.c"
 #include "./process/ota_util.c"
+#endif // CONFIG_LIBJADE
 #include "./process/pinclient.c"
 #include "./process/process_utils.c"
 #include "./process/register_attestation.c"
@@ -105,8 +121,10 @@ void __wrap_abort(void);
 #include "./process/register_multisig.c"
 #include "./process/register_otp.c"
 #include "./process/sign_attestation.c"
+#ifndef CONFIG_LIBJADE
 #include "./process/sign_bip85_digest.c"
 #include "./process/sign_identity.c"
+#endif // CONFIG_LIBJADE
 #include "./process/sign_message.c"
 #include "./process/sign_psbt.c"
 #include "./process/sign_tx.c"
@@ -119,15 +137,19 @@ void __wrap_abort(void);
 #include "./qrcode.c"
 #include "./qrmode.c"
 #include "./qrscan.c"
+#ifndef CONFIG_LIBJADE
 #include "./random.c"
 #include "./rsa.c"
 #include "./selfcheck.c"
 #include "./sensitive.c"
+#endif // CONFIG_LIBJADE
 #ifdef ESP_PLATFORM
 #include "./serial.c"
 #endif // ESP_PLATFORM
 #include "./signer.c"
+#ifndef CONFIG_LIBJADE
 #include "./smoketest.c"
+#endif // CONFIG_LIBJADE
 #include "./storage.c"
 #include "./ui/ble_confirm.c"
 #include "./ui/camera.c"
@@ -135,7 +157,9 @@ void __wrap_abort(void);
 #include "./ui/dashboard.c"
 #include "./ui/descriptor.c"
 #include "./ui/dialogs.c"
+#ifndef CONFIG_LIBJADE
 #include "./ui/keyboard.c"
+#endif // CONFIG_LIBJADE
 #include "./ui/mnemonic.c"
 #include "./ui/multisig.c"
 #include "./ui/ota.c"
@@ -154,11 +178,15 @@ void __wrap_abort(void);
 #endif // CONFIG_IDF_TARGET_ESP32S3
 #include "./utils/address.c"
 #include "./utils/cbor_rpc.c"
+#ifndef CONFIG_LIBJADE
 #include "./utils/event.c"
+#endif // CONFIG_LIBJADE
 #include "./utils/network.c"
 #include "./utils/psbt.c"
 #include "./utils/shake256.c"
+#ifndef CONFIG_LIBJADE
 #include "./utils/temporary_stack.c"
+#endif // CONFIG_LIBJADE
 #include "./utils/urldecode.c"
 #include "./utils/wally_ext.c"
 #include "./versioninfo.c"
