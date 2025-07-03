@@ -1,0 +1,23 @@
+test_sw_jade:
+  tags:
+    - ga
+  stage: format
+  script:
+    - . $HOME/esp/esp-idf/export.sh
+    - cp configs/sdkconfig_jade.defaults sdkconfig.defaults
+    - idf.py reconfigure
+    - cd $CI_PROJECT_DIR
+    - apt install -yqq python3-venv
+    - virtualenv -p python3 venv
+    - source venv/bin/activate
+    - pip install -r requirements.txt
+    - pip install -r pinserver/requirements.txt
+    - pip install .
+    - echo "----------------------- BUILD ---------------------------------"
+    - python ./components/assets/gen_assets.py ./components/assets/asset_data.json ./build/esp-idf/assets/asset_data.inc
+    - python ./components/assets/gen_assets.py ./components/assets/asset_data_testnet.json ./build/esp-idf/assets/asset_data_testnet.inc
+    - CFLAGS="-O2" ./make_libjade.sh
+    - echo "----------------------- STANDARD TESTS ------------------------"
+    - rm -f *.pin; LD_LIBRARY_PATH=$PWD python ./test_jade.py --run_sw --swtimeout=0 --log CRITICAL
+    - echo "----------------------- NON-LEGACY TESTS ----------------------"
+    - rm -f *.pin; LD_LIBRARY_PATH=$PWD python ./test_jade.py --run_sw --swtimeout=0 --log CRITICAL --nolegacyflow
