@@ -11,10 +11,14 @@ stages:
 
 image: blockstream/verde@sha256:9171360dae48d3fba7c0f36ab5eb45e2529d178a603e89197cb08fb123ca619e
 
+include:
+  - .gitlab-sw_jade.yml
+
 test_bip85_rsa_key_gen:
   tags:
     - ga
   stage: format
+  when: manual
   script:
     - . $HOME/esp/esp-idf/export.sh
     - (cd tools/bip85_rsa_key_gen && ./test.sh)
@@ -34,6 +38,7 @@ test_configs:
   tags:
     - ga
   stage: format
+  when: manual
   script:
     - ./tools/check_default_configs.sh
     - git diff --exit-code
@@ -42,6 +47,7 @@ test_configs:
   tags:
     - ga
   stage: build
+  when: manual
   artifacts:
     expire_in: 2 weeks
     when: on_success
@@ -413,6 +419,7 @@ test_flash_qemu_psram_unamalgamated:
 
 .test_flash_artifact_template:
   stage: deploy
+  when: manual
   tags:
     - esp32flasher
   script:
@@ -421,6 +428,7 @@ test_flash_qemu_psram_unamalgamated:
 
 .test_flash_artifact_template_v1_1:
   stage: deploy
+  when: manual
   tags:
     - esp32flasher_v1_1
   script:
@@ -429,6 +437,7 @@ test_flash_qemu_psram_unamalgamated:
 
 .test_flash_artifact_template_s3:
   stage: deploy
+  when: manual
   tags:
     - esp32s3flasher
   variables:
@@ -457,6 +466,7 @@ test_gcov:
   # for now this only works on s3
   tags:
     - esp32s3flasher
+  when: manual
   stage: build
   variables:
     IDF_TOOLS_PATH: "/home/gitlab-runner/.idf/54"
