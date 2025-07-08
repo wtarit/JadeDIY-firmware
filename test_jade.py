@@ -3696,16 +3696,18 @@ def run_api_tests(jadeapi, isble, qemu, authuser=False):
         assert rslt is True
 
     # Set mnemonic here instead of (or to override the result of) 'auth_user'
-    rslt = jadeapi.set_mnemonic(TEST_MNEMONIC)
+    # rslt = jadeapi.set_mnemonic(TEST_MNEMONIC)
+    crash_mnemonic = 'debate lens sunny vivid layer explain poverty card fade derive anchor spin'
+    rslt = jadeapi.set_mnemonic(crash_mnemonic)
     assert rslt is True
 
     # Test logout and log back in before we collect mem stats in case there are
     # 'one off' allocations when we first log in
     assert jadeapi.get_version_info()['JADE_STATE'] == 'READY'
-    jadeapi.logout()
-    assert jadeapi.get_version_info()['JADE_STATE'] in ['LOCKED', 'UNINIT']
-    rslt = jadeapi.set_mnemonic(TEST_MNEMONIC)
-    assert jadeapi.get_version_info()['JADE_STATE'] == 'READY'
+    # jadeapi.logout()
+    # assert jadeapi.get_version_info()['JADE_STATE'] in ['LOCKED', 'UNINIT']
+    # rslt = jadeapi.set_mnemonic(TEST_MNEMONIC)
+    # assert jadeapi.get_version_info()['JADE_STATE'] == 'READY'
 
     rslt = jadeapi.ping()
     assert rslt == 0  # idle
@@ -3715,6 +3717,9 @@ def run_api_tests(jadeapi, isble, qemu, authuser=False):
     assert len(startinfo) == NUM_VALUES_VERINFO
     has_psram = startinfo['JADE_FREE_SPIRAM'] > 0
     has_ble = startinfo['JADE_CONFIG'] == 'BLE'
+
+    test_sign_psbt(jadeapi, 'p2tr_crash*.json', has_psram)
+    return
 
     # Test update pinserver details
     test_set_pinserver(jadeapi)
@@ -3926,8 +3931,8 @@ def run_jade_tests(jadeapi, isble):
     logger.info(f'Running selected Jade tests over passed connection, is_ble={isble}')
 
     # Low-level JadeInterface tests
-    if not args.skiplow:
-        run_interface_tests(jadeapi, isble, args.qemu, authuser=args.authuser)
+    # if not args.skiplow:
+    #     run_interface_tests(jadeapi, isble, args.qemu, authuser=args.authuser)
 
     # High-level JadeAPI tests
     if not args.skiphigh:

@@ -74,6 +74,7 @@ test_configs:
 
 test_build_qemu:
   extends: .test_build_template
+  when: always
   before_script:
     - cp configs/sdkconfig_qemu.defaults sdkconfig.defaults
   after_script:
@@ -81,6 +82,7 @@ test_build_qemu:
 
 test_build_qemu_psram:
   extends: .test_build_template
+  when: always
   before_script:
     - cp configs/sdkconfig_qemu_psram.defaults sdkconfig.defaults
   after_script:
@@ -109,6 +111,7 @@ prod_build_jade_noradio:
     - mv build build_noradio_prod
 
 prod_build_jade_v1_1:
+  when: always
   before_script:
     - cp production/sdkconfig_jade_v1_1_prod.defaults sdkconfig.defaults
   extends: .test_build_template
