@@ -8,7 +8,7 @@ void __wrap_abort(void);
 #define BUILD_ELEMENTS 1
 #define BUILD_MINIMAL 1
 #ifndef CONFIG_LIBJADE
-#define HAVE_MBEDTLS_SHA256_H
+//#define HAVE_MBEDTLS_SHA256_H
 #define HAVE_MBEDTLS_SHA512_H
 #endif
 #define ECMULT_WINDOW_SIZE 8
