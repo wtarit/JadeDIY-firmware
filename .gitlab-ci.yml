@@ -161,6 +161,7 @@ test_build_jade_ci:
     - mv build build_jade_ci
 
 test_build_jade_v1_1_ci:
+  when: always
   before_script:
     - cp configs/sdkconfig_jade_v1_1_ci.defaults sdkconfig.defaults
   extends: .test_build_template
@@ -507,6 +508,7 @@ test_flash_artifact_ota_delta:
 
 test_flash_artifact_ota_delta_v1_1:
   stage: deploy
+  when: manual
   tags:
     - esp32flasher_v1_1
   needs:
@@ -528,6 +530,7 @@ test_flash_artifact_noblobs:
 
 test_flash_artifact_v1_1:
   extends: .test_flash_artifact_template_v1_1
+  when: always
   needs:
     - test_build_jade_v1_1_ci
   before_script:
