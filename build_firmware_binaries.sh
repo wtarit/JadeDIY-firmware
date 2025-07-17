@@ -5,7 +5,7 @@ CONTAINER_SHARED_DIRECTORY=/docker_data
 HOST_SHARED_DIRECTORY=./docker_data
 CONFIGS_DIR=./configs
 HOST_OUTPUT_DIR=${HOST_SHARED_DIRECTORY}/firmware_binaries
-EXCLUDE_CONFIG=("_jade" "_ci" "_qemu" "_noradio" "display")
+EXCLUDE_CONFIG=("_jade" "_ci" "_qemu" "_noradio")
 COMPRESS_OUTPUT=false
 
 if [ "$1" = "-c" ]; then
